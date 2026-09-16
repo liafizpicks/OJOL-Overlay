@@ -2,19 +2,14 @@ package com.fizi.ojoloverlay;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.content.Intent;
-import android.net.Uri;
 import android.graphics.Color;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
-
-    private TextView statusText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,54 +17,47 @@ public class MainActivity extends Activity {
 
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(40, 40, 40, 40);
-        layout.setGravity(Gravity.CENTER);
+        layout.setPadding(40, 50, 40, 40);
+        layout.setGravity(Gravity.CENTER_HORIZONTAL);
 
         TextView title = new TextView(this);
-        title.setText("OJOL Overlay");
+        title.setText("OJOL-Overlay");
         title.setTextSize(28);
         title.setTextColor(Color.BLACK);
         title.setGravity(Gravity.CENTER);
 
-        statusText = new TextView(this);
-        statusText.setTextSize(16);
-        statusText.setGravity(Gravity.CENTER);
-        statusText.setPadding(0, 30, 0, 30);
+        layout.addView(title);
 
-        Button permissionButton = new Button(this);
-        permissionButton.setText("IZINKAN OVERLAY");
+        Button open = new Button(this);
+        open.setText("🟢 Buka InDrive");
 
-        permissionButton.setOnClickListener(v -> {
-            if (!Settings.canDrawOverlays(this)) {
-                Intent intent = new Intent(
-                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName())
-                );
+        open.setOnClickListener(v -> {
+            Intent intent = getPackageManager()
+                    .getLaunchIntentForPackage("sinet.startup.inDriver");
+
+            if (intent != null) {
                 startActivity(intent);
             }
-            updateStatus();
         });
 
-        layout.addView(title);
-        layout.addView(statusText);
-        layout.addView(permissionButton);
+        layout.addView(open);
+
+        Button small = new Button(this);
+        small.setText("📐 Ukuran Kecil");
+        layout.addView(small);
+
+        Button medium = new Button(this);
+        medium.setText("📱 Ukuran Sedang");
+        layout.addView(medium);
+
+        Button large = new Button(this);
+        large.setText("🖥️ Ukuran Besar");
+        layout.addView(large);
+
+        Button close = new Button(this);
+        close.setText("❌ Tutup");
+        layout.addView(close);
 
         setContentView(layout);
-
-        updateStatus();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateStatus();
-    }
-
-    private void updateStatus() {
-        if (Settings.canDrawOverlays(this)) {
-            statusText.setText("✅ Izin overlay sudah aktif");
-        } else {
-            statusText.setText("⚠️ Izin overlay belum aktif");
-        }
     }
 }
