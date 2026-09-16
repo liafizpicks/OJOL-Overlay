@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>OJOL LIVE MAP</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    font-family: Arial, sans-serif;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+    background: #202124;
+}
+
+.info {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999;
+    background: rgba(0,0,0,.72);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.status {
+    color: #00e676;
+    font-weight: bold;
+}
+
+#motor {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 30px;
+    z-index: 1000;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,.5));
+}
+
+#accuracy {
+    margin-top: 3px;
+    font-size: 10px;
+    opacity: .7;
+}
+</style>
+</head>
+
+<body>
+
+<div id="map">
+
+    <div class="info">
+        <div class="status">● GPS AKTIF</div>
+        <div id="location">Mencari lokasi...</div>
+        <div id="accuracy"></div>
+    </div>
+
+    <div id="motor">🛵</div>
+
+</div>
+
+<script>
+
+function updateLocation(position) {
+
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+    const accuracy = Math.round(position.coords.accuracy);
+
+    document.getElementById("location").innerHTML =
+        lat.toFixed(5) + " , " + lon.toFixed(5);
+
+    document.getElementById("accuracy").innerHTML =
+        "Akurasi ± " + accuracy + " m";
+
+}
+
+function locationError(error) {
+
+    document.getElementById("location").innerHTML =
+        "GPS belum tersedia";
+
+    console.log(error);
+
+}
+
+if ("geolocation" in navigator) {
+
+    navigator.geolocation.watchPosition(
+        updateLocation,
+        locationError,
+        {
+            enableHighAccuracy: true,
+            maximumAge: 2000,
+            timeout: 10000
+        }
+    );
+
+} else {
+
+    document.getElementById("location").innerHTML =
+        "GPS tidak didukung";
+
+}
+
+</script>
+
+</body>
+</html>
