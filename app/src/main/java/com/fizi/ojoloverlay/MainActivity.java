@@ -13,9 +13,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends Activity {
@@ -23,14 +20,15 @@ public class MainActivity extends Activity {
     int dark = Color.rgb(18, 18, 22);
     int green = Color.rgb(0, 190, 110);
     int white = Color.WHITE;
-    int gray = Color.rgb(130, 130, 140);
+    int orange = Color.rgb(245, 150, 40);
+    int blue = Color.rgb(45, 120, 220);
+    int red = Color.rgb(220, 60, 60);
 
     private String inDrivePackage = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         buildUI();
     }
 
@@ -42,7 +40,7 @@ public class MainActivity extends Activity {
         root.setBackgroundColor(Color.rgb(245, 246, 248));
 
         TextView title = new TextView(this);
-        title.setText("JADIOJOL OVERLAY");
+        title.setText("OJOL-OVERLAY");
         title.setTextSize(26);
         title.setTextColor(Color.BLACK);
         title.setTypeface(null, Typeface.BOLD);
@@ -55,7 +53,6 @@ public class MainActivity extends Activity {
         status.setGravity(Gravity.CENTER);
         status.setPadding(0, 15, 0, 15);
 
-        // Cari InDrive otomatis
         findInDrive();
 
         if (inDrivePackage != null) {
@@ -63,10 +60,14 @@ public class MainActivity extends Activity {
             status.setTextColor(green);
         } else {
             status.setText("●  INDRIVE TIDAK DITEMUKAN");
-            status.setTextColor(Color.RED);
+            status.setTextColor(red);
         }
 
         root.addView(status);
+
+        // =========================
+        // BUKA INDRIVE
+        // =========================
 
         Button buka = button(
                 "🟢  BUKA INDRIVE",
@@ -80,7 +81,9 @@ public class MainActivity extends Activity {
 
                 Intent intent =
                         getPackageManager()
-                                .getLaunchIntentForPackage(inDrivePackage);
+                                .getLaunchIntentForPackage(
+                                        inDrivePackage
+                                );
 
                 if (intent != null) {
                     startActivity(intent);
@@ -95,65 +98,128 @@ public class MainActivity extends Activity {
 
         root.addView(buka);
 
-        TextView listTitle = sectionTitle(
-                "APLIKASI YANG TERDETEKSI"
+        // =========================
+        // KONTROL OVERLAY
+        // =========================
+
+        root.addView(
+                sectionTitle("KONTROL FLOATING INDRIVE")
         );
 
-        root.addView(listTitle);
-
-        // Daftar aplikasi
-        List<ApplicationInfo> apps =
-                getPackageManager()
-                        .getInstalledApplications(
-                                PackageManager.GET_META_DATA
-                        );
-
-        Collections.sort(
-                apps,
-                new Comparator<ApplicationInfo>() {
-                    @Override
-                    public int compare(
-                            ApplicationInfo a,
-                            ApplicationInfo b) {
-
-                        String nameA =
-                                a.loadLabel(
-                                        getPackageManager()
-                                ).toString();
-
-                        String nameB =
-                                b.loadLabel(
-                                        getPackageManager()
-                                ).toString();
-
-                        return nameA.compareToIgnoreCase(nameB);
-                    }
-                }
+        Button kecil = button(
+                "📐  UKURAN KECIL",
+                dark,
+                white
         );
 
-        for (ApplicationInfo app : apps) {
+        kecil.setOnClickListener(v -> {
+            // Akan digunakan untuk mengatur ukuran floating window
+        });
 
-            String name =
-                    app.loadLabel(
-                            getPackageManager()
-                    ).toString();
+        root.addView(kecil);
 
-            if (name.toLowerCase().contains("indrive")) {
+        Button sedang = button(
+                "📱  UKURAN SEDANG",
+                blue,
+                white
+        );
 
-                TextView found = new TextView(this);
+        sedang.setOnClickListener(v -> {
+            // Akan digunakan untuk mengatur ukuran floating window
+        });
 
-                found.setText(
-                        "✓ " + name +
-                        "\n  " + app.packageName
-                );
+        root.addView(sedang);
 
-                found.setTextSize(14);
-                found.setTextColor(Color.DKGRAY);
-                found.setPadding(15, 12, 15, 12);
+        Button besar = button(
+                "🖥️  UKURAN BESAR",
+                orange,
+                white
+        );
 
-                root.addView(found);
-            }
+        besar.setOnClickListener(v -> {
+            // Akan digunakan untuk mengatur ukuran floating window
+        });
+
+        root.addView(besar);
+
+        Button geser = button(
+                "↔️  GESER POSISI",
+                dark,
+                white
+        );
+
+        geser.setOnClickListener(v -> {
+            // Akan digunakan untuk mode geser floating window
+        });
+
+        root.addView(geser);
+
+        Button lock = button(
+                "🔒  LOCK POSISI",
+                blue,
+                white
+        );
+
+        lock.setOnClickListener(v -> {
+            // Akan digunakan untuk mengunci posisi floating window
+        });
+
+        root.addView(lock);
+
+        Button tutup = button(
+                "❌  TUTUP OVERLAY",
+                red,
+                white
+        );
+
+        tutup.setOnClickListener(v -> {
+            // Akan digunakan untuk menutup floating window
+        });
+
+        root.addView(tutup);
+
+        // =========================
+        // INFO INDRIVE
+        // =========================
+
+        root.addView(
+                sectionTitle("APLIKASI INDRIVE")
+        );
+
+        if (inDrivePackage != null) {
+
+            TextView found = new TextView(this);
+
+            found.setText(
+                    "✓ InDrive ditemukan\n\n" +
+                    "Package:\n" +
+                    inDrivePackage
+            );
+
+            found.setTextSize(14);
+            found.setTextColor(Color.DKGRAY);
+            found.setPadding(15, 12, 15, 12);
+
+            root.addView(found);
+
+        } else {
+
+            TextView notFound = new TextView(this);
+
+            notFound.setText(
+                    "InDrive belum ditemukan."
+            );
+
+            notFound.setTextSize(14);
+            notFound.setTextColor(red);
+            notFound.setPadding(15, 12, 15, 12);
+
+            root.addView(notFound);
         }
+
+        // =========================
+        // SCAN ULANG
+        // =========================
 
         Button refresh = button(
                 "🔄  SCAN ULANG",
@@ -169,6 +235,10 @@ public class MainActivity extends Activity {
 
         setContentView(root);
     }
+
+    // =========================
+    // DETEKSI INDRIVE
+    // =========================
 
     private void findInDrive() {
 
@@ -198,6 +268,10 @@ public class MainActivity extends Activity {
         }
     }
 
+    // =========================
+    // JUDUL SECTION
+    // =========================
+
     private TextView sectionTitle(String text) {
 
         TextView t = new TextView(this);
@@ -210,6 +284,10 @@ public class MainActivity extends Activity {
 
         return t;
     }
+
+    // =========================
+    // BUTTON
+    // =========================
 
     private Button button(
             String text,
