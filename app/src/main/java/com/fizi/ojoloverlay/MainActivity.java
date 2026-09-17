@@ -2,7 +2,6 @@ package com.fizi.ojoloverlay;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -15,9 +14,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.List;
-
 public class MainActivity extends Activity {
+
+    private static final String INDRIVE_PACKAGE =
+            "sinet.startup.inDrver";
 
     int dark = Color.rgb(18, 18, 22);
     int green = Color.rgb(0, 190, 110);
@@ -41,9 +41,12 @@ public class MainActivity extends Activity {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(28, 30, 28, 25);
-        root.setBackgroundColor(Color.rgb(245, 246, 248));
+        root.setBackgroundColor(
+                Color.rgb(245, 246, 248)
+        );
 
         TextView title = new TextView(this);
+
         title.setText("JADIOJOL-OVERLAY");
         title.setTextSize(26);
         title.setTextColor(Color.BLACK);
@@ -53,19 +56,33 @@ public class MainActivity extends Activity {
         root.addView(title);
 
         TextView status = new TextView(this);
+
         status.setTextSize(14);
         status.setGravity(Gravity.CENTER);
         status.setPadding(0, 15, 0, 15);
 
         if (inDrivePackage != null) {
-            status.setText("● INDRIVE TERDETEKSI");
+
+            status.setText(
+                    "● INDRIVE TERDETEKSI"
+            );
+
             status.setTextColor(green);
+
         } else {
-            status.setText("● INDRIVE TIDAK DITEMUKAN");
+
+            status.setText(
+                    "● INDRIVE TIDAK DITEMUKAN"
+            );
+
             status.setTextColor(red);
         }
 
         root.addView(status);
+
+        // =========================
+        // BUKA INDRIVE
+        // =========================
 
         Button buka = button(
                 "🟢  BUKA INDRIVE FLOATING",
@@ -76,7 +93,11 @@ public class MainActivity extends Activity {
         buka.setOnClickListener(v -> {
 
             if (inDrivePackage == null) {
-                toast("InDrive tidak ditemukan");
+
+                toast(
+                        "InDrive tidak ditemukan"
+                );
+
                 return;
             }
 
@@ -93,9 +114,15 @@ public class MainActivity extends Activity {
 
         root.addView(buka);
 
-        root.addView(sectionTitle(
-                "KONTROL FLOATING INDRIVE"
-        ));
+        // =========================
+        // KONTROL FLOATING
+        // =========================
+
+        root.addView(
+                sectionTitle(
+                        "KONTROL FLOATING INDRIVE"
+                )
+        );
 
         Button kecil = button(
                 "📐  UKURAN KECIL",
@@ -104,6 +131,8 @@ public class MainActivity extends Activity {
         );
 
         kecil.setOnClickListener(v -> {
+
+            if (!checkInDrive()) return;
 
             RootController.launchInDrive(
                     inDrivePackage,
@@ -126,6 +155,8 @@ public class MainActivity extends Activity {
 
         sedang.setOnClickListener(v -> {
 
+            if (!checkInDrive()) return;
+
             RootController.launchInDrive(
                     inDrivePackage,
                     20,
@@ -146,6 +177,8 @@ public class MainActivity extends Activity {
         );
 
         besar.setOnClickListener(v -> {
+
+            if (!checkInDrive()) return;
 
             RootController.launchInDrive(
                     inDrivePackage,
@@ -168,6 +201,8 @@ public class MainActivity extends Activity {
 
         geser.setOnClickListener(v -> {
 
+            if (!checkInDrive()) return;
+
             RootController.launchInDrive(
                     inDrivePackage,
                     280,
@@ -189,6 +224,8 @@ public class MainActivity extends Activity {
 
         kiri.setOnClickListener(v -> {
 
+            if (!checkInDrive()) return;
+
             RootController.launchInDrive(
                     inDrivePackage,
                     10,
@@ -197,6 +234,7 @@ public class MainActivity extends Activity {
                     650
             );
 
+            toast("Posisi kiri");
         });
 
         root.addView(kiri);
@@ -209,6 +247,8 @@ public class MainActivity extends Activity {
 
         kanan.setOnClickListener(v -> {
 
+            if (!checkInDrive()) return;
+
             RootController.launchInDrive(
                     inDrivePackage,
                     290,
@@ -217,6 +257,7 @@ public class MainActivity extends Activity {
                     650
             );
 
+            toast("Posisi kanan");
         });
 
         root.addView(kanan);
@@ -228,6 +269,8 @@ public class MainActivity extends Activity {
         );
 
         lock.setOnClickListener(v -> {
+
+            if (!checkInDrive()) return;
 
             Intent intent =
                     new Intent(
@@ -266,17 +309,25 @@ public class MainActivity extends Activity {
 
         root.addView(tutup);
 
-        root.addView(sectionTitle(
-                "STATUS INDRIVE"
-        ));
+        // =========================
+        // STATUS
+        // =========================
+
+        root.addView(
+                sectionTitle(
+                        "STATUS INDRIVE"
+                )
+        );
 
         TextView info = new TextView(this);
 
         info.setText(
-                "Package InDrive:\n" +
-                (inDrivePackage == null
-                        ? "Tidak ditemukan"
-                        : inDrivePackage)
+                "Package InDrive:\n\n" +
+                (
+                        inDrivePackage == null
+                                ? "Tidak ditemukan"
+                                : inDrivePackage
+                )
         );
 
         info.setTextSize(14);
@@ -284,6 +335,10 @@ public class MainActivity extends Activity {
         info.setPadding(15, 12, 15, 12);
 
         root.addView(info);
+
+        // =========================
+        // SCAN ULANG
+        // =========================
 
         Button refresh = button(
                 "🔄  SCAN ULANG",
@@ -300,6 +355,58 @@ public class MainActivity extends Activity {
         setContentView(root);
     }
 
+    // =========================
+    // CEK INDRIVE
+    // =========================
+
+    private boolean checkInDrive() {
+
+        findInDrive();
+
+        if (inDrivePackage == null) {
+
+            toast(
+                    "InDrive tidak ditemukan"
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    // =========================
+    // DETEKSI INDRIVE
+    // PACKAGE DIKUNCI
+    // =========================
+
+    private void findInDrive() {
+
+        inDrivePackage = null;
+
+        try {
+
+            getPackageManager()
+                    .getApplicationInfo(
+                            INDRIVE_PACKAGE,
+                            PackageManager.GET_META_DATA
+                    );
+
+            inDrivePackage =
+                    INDRIVE_PACKAGE;
+
+        } catch (
+                PackageManager.NameNotFoundException e
+        ) {
+
+            inDrivePackage = null;
+        }
+    }
+
+    // =========================
+    // OVERLAY SERVICE
+    // =========================
+
     private void startOverlayService() {
 
         if (!Settings.canDrawOverlays(this)) {
@@ -310,6 +417,7 @@ public class MainActivity extends Activity {
                     );
 
             startActivity(intent);
+
             return;
         }
 
@@ -322,60 +430,61 @@ public class MainActivity extends Activity {
         startService(service);
     }
 
-    private void findInDrive() {
+    // =========================
+    // SECTION TITLE
+    // =========================
 
-        inDrivePackage = null;
+    private TextView sectionTitle(
+            String text
+    ) {
 
-        PackageManager pm = getPackageManager();
-
-        List<ApplicationInfo> apps =
-                pm.getInstalledApplications(
-                        PackageManager.GET_META_DATA
-                );
-
-        for (ApplicationInfo app : apps) {
-
-            String name =
-                    app.loadLabel(pm)
-                            .toString();
-
-            if (name.toLowerCase()
-                    .contains("indrive")) {
-
-                inDrivePackage =
-                        app.packageName;
-
-                break;
-            }
-        }
-    }
-
-    private TextView sectionTitle(String text) {
-
-        TextView t = new TextView(this);
+        TextView t =
+                new TextView(this);
 
         t.setText(text);
         t.setTextSize(12);
         t.setTextColor(Color.DKGRAY);
-        t.setTypeface(null, Typeface.BOLD);
-        t.setPadding(5, 18, 5, 8);
+        t.setTypeface(
+                null,
+                Typeface.BOLD
+        );
+
+        t.setPadding(
+                5,
+                18,
+                5,
+                8
+        );
 
         return t;
     }
 
+    // =========================
+    // BUTTON
+    // =========================
+
     private Button button(
             String text,
             int background,
-            int textColor) {
+            int textColor
+    ) {
 
-        Button b = new Button(this);
+        Button b =
+                new Button(this);
 
         b.setText(text);
         b.setTextSize(13);
         b.setTextColor(textColor);
-        b.setTypeface(null, Typeface.BOLD);
+        b.setTypeface(
+                null,
+                Typeface.BOLD
+        );
+
         b.setAllCaps(false);
-        b.setGravity(Gravity.CENTER);
+
+        b.setGravity(
+                Gravity.CENTER
+        );
 
         GradientDrawable bg =
                 new GradientDrawable();
@@ -391,14 +500,26 @@ public class MainActivity extends Activity {
                         65
                 );
 
-        params.setMargins(0, 4, 0, 4);
+        params.setMargins(
+                0,
+                4,
+                0,
+                4
+        );
 
         b.setLayoutParams(params);
 
         return b;
     }
 
-    private void toast(String text) {
+    // =========================
+    // TOAST
+    // =========================
+
+    private void toast(
+            String text
+    ) {
+
         Toast.makeText(
                 this,
                 text,
