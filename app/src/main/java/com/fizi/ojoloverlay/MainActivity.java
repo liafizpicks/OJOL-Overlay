@@ -80,6 +80,16 @@ buka.setOnClickListener(v -> {
 
     if (intent != null) {
         startActivity(intent);
+    } else {
+        buka.setText("❌ INDRIVE TIDAK DITEMUKAN");
+    }
+});
+
+    Intent intent = getPackageManager()
+            .getLaunchIntentForPackage("sinet.startup.inDriver");
+
+    if (intent != null) {
+        startActivity(intent);
     }
 });
 
@@ -123,7 +133,7 @@ buka.setOnClickListener(v -> {
 
         // FOOTER
         TextView footer = new TextView(this);
-        footer.setText("\nOJOL OVERLAY • v1.0");
+        footer.setText("\nJADIOJOL OVERLAY • v1.0");
         footer.setTextSize(11);
         footer.setTextColor(gray);
         footer.setGravity(Gravity.CENTER);
