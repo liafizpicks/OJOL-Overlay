@@ -2,6 +2,9 @@ package com.fizi.ojoloverlay;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -9,7 +12,11 @@ import android.view.Gravity;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.content.Intent;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class MainActivity extends Activity {
 
@@ -18,61 +25,69 @@ public class MainActivity extends Activity {
     int white = Color.WHITE;
     int gray = Color.rgb(130, 130, 140);
 
+    private String inDrivePackage = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        buildUI();
+    }
+
+    private void buildUI() {
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(28, 35, 28, 28);
         root.setBackgroundColor(Color.rgb(245, 246, 248));
 
-        LinearLayout header = new LinearLayout(this);
-        header.setOrientation(LinearLayout.VERTICAL);
-        header.setGravity(Gravity.CENTER);
-        header.setPadding(20, 25, 20, 25);
-        header.setBackground(round(dark, 28));
-
-        TextView logo = new TextView(this);
-        logo.setText("🛵");
-        logo.setTextSize(42);
-        logo.setGravity(Gravity.CENTER);
-
         TextView title = new TextView(this);
         title.setText("JADIOJOL OVERLAY");
         title.setTextSize(26);
-        title.setTextColor(white);
+        title.setTextColor(Color.BLACK);
         title.setTypeface(null, Typeface.BOLD);
         title.setGravity(Gravity.CENTER);
 
-        TextView subtitle = new TextView(this);
-        subtitle.setText("SMART FLOATING CONTROL");
-        subtitle.setTextSize(11);
-        subtitle.setTextColor(Color.LTGRAY);
-        subtitle.setGravity(Gravity.CENTER);
-
-        header.addView(logo);
-        header.addView(title);
-        header.addView(subtitle);
-        root.addView(header);
+        root.addView(title);
 
         TextView status = new TextView(this);
-        status.setText("●  INDRIVE READY");
-        status.setTextSize(13);
-        status.setTextColor(green);
-        status.setTypeface(null, Typeface.BOLD);
+        status.setTextSize(14);
         status.setGravity(Gravity.CENTER);
-        status.setPadding(0, 25, 0, 15);
+        status.setPadding(0, 15, 0, 15);
+
+        // Cari InDrive otomatis
+        findInDrive();
+
+        if (inDrivePackage != null) {
+            status.setText("●  INDRIVE TERDETEKSI");
+            status.setTextColor(green);
+        } else {
+            status.setText("●  INDRIVE TIDAK DITEMUKAN");
+            status.setTextColor(Color.RED);
+        }
+
         root.addView(status);
 
-        Button buka = button("🟢  BUKA INDRIVE", green, white);
+        Button buka = button(
+                "🟢  BUKA INDRIVE",
+                green,
+                white
+        );
 
         buka.setOnClickListener(v -> {
-            Intent intent = getPackageManager()
-                    .getLaunchIntentForPackage("sinet.startup.inDriver");
 
-            if (intent != null) {
-                startActivity(intent);
+            if (inDrivePackage != null) {
+
+                Intent intent =
+                        getPackageManager()
+                                .getLaunchIntentForPackage(inDrivePackage);
+
+                if (intent != null) {
+                    startActivity(intent);
+                } else {
+                    buka.setText("❌ GAGAL MEMBUKA");
+                }
+
             } else {
                 buka.setText("❌ INDRIVE TIDAK DITEMUKAN");
             }
@@ -80,69 +95,139 @@ public class MainActivity extends Activity {
 
         root.addView(buka);
 
-        TextView ukuranTitle = sectionTitle("UKURAN FLOATING WINDOW");
-        root.addView(ukuranTitle);
+        TextView listTitle = sectionTitle(
+                "APLIKASI YANG TERDETEKSI"
+        );
 
-        Button kecil = button("📐  KECIL", dark, white);
-        Button sedang = button("📱  SEDANG", dark, white);
-        Button besar = button("🖥️  BESAR", dark, white);
+        root.addView(listTitle);
 
-        root.addView(kecil);
-        root.addView(sedang);
-        root.addView(besar);
+        // Daftar aplikasi
+        List<ApplicationInfo> apps =
+                getPackageManager()
+                        .getInstalledApplications(
+                                PackageManager.GET_META_DATA
+                        );
 
-        TextView kontrolTitle = sectionTitle("KONTROL POSISI");
-        root.addView(kontrolTitle);
+        Collections.sort(
+                apps,
+                new Comparator<ApplicationInfo>() {
+                    @Override
+                    public int compare(
+                            ApplicationInfo a,
+                            ApplicationInfo b) {
 
-        LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.HORIZONTAL);
+                        String nameA =
+                                a.loadLabel(
+                                        getPackageManager()
+                                ).toString();
 
-        Button geser = button("↔️  GESER", dark, white);
-        Button lock = button("🔒  LOCK", dark, white);
+                        String nameB =
+                                b.loadLabel(
+                                        getPackageManager()
+                                ).toString();
 
-        row.addView(geser, new LinearLayout.LayoutParams(0, 70, 1));
-        row.addView(lock, new LinearLayout.LayoutParams(0, 70, 1));
+                        return nameA.compareToIgnoreCase(nameB);
+                    }
+                }
+        );
 
-        root.addView(row);
+        for (ApplicationInfo app : apps) {
 
-        Button tutup = button("❌  TUTUP OVERLAY",
-                Color.rgb(220, 60, 60), white);
+            String name =
+                    app.loadLabel(
+                            getPackageManager()
+                    ).toString();
 
-        root.addView(tutup);
+            if (name.toLowerCase().contains("indrive")) {
 
-        TextView footer = new TextView(this);
-        footer.setText("\nJADIOJOL OVERLAY • v1.0");
-        footer.setTextSize(11);
-        footer.setTextColor(gray);
-        footer.setGravity(Gravity.CENTER);
+                TextView found = new TextView(this);
 
-        root.addView(footer);
+                found.setText(
+                        "✓ " + name +
+                        "\n  " + app.packageName
+                );
+
+                found.setTextSize(14);
+                found.setTextColor(Color.DKGRAY);
+                found.setPadding(15, 12, 15, 12);
+
+                root.addView(found);
+            }
+        }
+
+        Button refresh = button(
+                "🔄  SCAN ULANG",
+                dark,
+                white
+        );
+
+        refresh.setOnClickListener(v -> {
+            buildUI();
+        });
+
+        root.addView(refresh);
 
         setContentView(root);
     }
 
+    private void findInDrive() {
+
+        inDrivePackage = null;
+
+        PackageManager pm = getPackageManager();
+
+        List<ApplicationInfo> apps =
+                pm.getInstalledApplications(
+                        PackageManager.GET_META_DATA
+                );
+
+        for (ApplicationInfo app : apps) {
+
+            String name =
+                    app.loadLabel(pm)
+                            .toString();
+
+            if (name.toLowerCase()
+                    .contains("indrive")) {
+
+                inDrivePackage =
+                        app.packageName;
+
+                break;
+            }
+        }
+    }
+
     private TextView sectionTitle(String text) {
+
         TextView t = new TextView(this);
+
         t.setText(text);
         t.setTextSize(12);
         t.setTextColor(Color.DKGRAY);
         t.setTypeface(null, Typeface.BOLD);
         t.setPadding(5, 20, 5, 8);
+
         return t;
     }
 
-    private Button button(String text, int background, int textColor) {
+    private Button button(
+            String text,
+            int background,
+            int textColor) {
 
         Button b = new Button(this);
 
         b.setText(text);
-        b.setTextSize(14);
+        b.setTextSize(13);
         b.setTextColor(textColor);
         b.setTypeface(null, Typeface.BOLD);
         b.setAllCaps(false);
         b.setGravity(Gravity.CENTER);
 
-        GradientDrawable bg = new GradientDrawable();
+        GradientDrawable bg =
+                new GradientDrawable();
+
         bg.setColor(background);
         bg.setCornerRadius(22);
 
@@ -151,18 +236,13 @@ public class MainActivity extends Activity {
         LinearLayout.LayoutParams params =
                 new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
-                        70);
+                        70
+                );
 
         params.setMargins(0, 5, 0, 5);
+
         b.setLayoutParams(params);
 
         return b;
-    }
-
-    private GradientDrawable round(int color, float radius) {
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(color);
-        bg.setCornerRadius(radius);
-        return bg;
     }
 }
