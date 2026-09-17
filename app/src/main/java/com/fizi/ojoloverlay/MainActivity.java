@@ -72,15 +72,16 @@ public class MainActivity extends Activity {
 
         // BUKA
         Button buka = button("🟢  BUKA INDRIVE", green, white);
-        buka.setOnClickListener(v -> {
 
-            Intent intent = getPackageManager()
-                    .getLaunchIntentForPackage("sinet.startup.inDriver");
+buka.setOnClickListener(v -> {
 
-            if (intent != null) {
-                startActivity(intent);
-            }
-        });
+    Intent intent = getPackageManager()
+            .getLaunchIntentForPackage("sinet.startup.inDriver");
+
+    if (intent != null) {
+        startActivity(intent);
+    }
+});
 
         root.addView(buka);
 
