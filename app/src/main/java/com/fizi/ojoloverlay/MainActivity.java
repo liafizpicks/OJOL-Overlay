@@ -47,7 +47,7 @@ public class MainActivity extends Activity {
 
         TextView title = new TextView(this);
 
-        title.setText("JADIOJOL-OVERLAY");
+        title.setText("OJOL-OVERLAY");
         title.setTextSize(26);
         title.setTextColor(Color.BLACK);
         title.setTypeface(null, Typeface.BOLD);
