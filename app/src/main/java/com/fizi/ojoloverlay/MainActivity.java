@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,7 +27,6 @@ public class MainActivity extends Activity {
         root.setPadding(28, 35, 28, 28);
         root.setBackgroundColor(Color.rgb(245, 246, 248));
 
-        // HEADER
         LinearLayout header = new LinearLayout(this);
         header.setOrientation(LinearLayout.VERTICAL);
         header.setGravity(Gravity.CENTER);
@@ -56,10 +54,8 @@ public class MainActivity extends Activity {
         header.addView(logo);
         header.addView(title);
         header.addView(subtitle);
-
         root.addView(header);
 
-        // STATUS
         TextView status = new TextView(this);
         status.setText("●  INDRIVE READY");
         status.setTextSize(13);
@@ -67,35 +63,23 @@ public class MainActivity extends Activity {
         status.setTypeface(null, Typeface.BOLD);
         status.setGravity(Gravity.CENTER);
         status.setPadding(0, 25, 0, 15);
-
         root.addView(status);
 
-        // BUKA
         Button buka = button("🟢  BUKA INDRIVE", green, white);
 
-buka.setOnClickListener(v -> {
+        buka.setOnClickListener(v -> {
+            Intent intent = getPackageManager()
+                    .getLaunchIntentForPackage("sinet.startup.inDriver");
 
-    Intent intent = getPackageManager()
-            .getLaunchIntentForPackage("sinet.startup.inDriver");
-
-    if (intent != null) {
-        startActivity(intent);
-    } else {
-        buka.setText("❌ INDRIVE TIDAK DITEMUKAN");
-    }
-});
-
-    Intent intent = getPackageManager()
-            .getLaunchIntentForPackage("sinet.startup.inDriver");
-
-    if (intent != null) {
-        startActivity(intent);
-    }
-});
+            if (intent != null) {
+                startActivity(intent);
+            } else {
+                buka.setText("❌ INDRIVE TIDAK DITEMUKAN");
+            }
+        });
 
         root.addView(buka);
 
-        // SECTION
         TextView ukuranTitle = sectionTitle("UKURAN FLOATING WINDOW");
         root.addView(ukuranTitle);
 
@@ -107,7 +91,6 @@ buka.setOnClickListener(v -> {
         root.addView(sedang);
         root.addView(besar);
 
-        // SECTION
         TextView kontrolTitle = sectionTitle("KONTROL POSISI");
         root.addView(kontrolTitle);
 
@@ -117,21 +100,16 @@ buka.setOnClickListener(v -> {
         Button geser = button("↔️  GESER", dark, white);
         Button lock = button("🔒  LOCK", dark, white);
 
-        row.addView(geser, new LinearLayout.LayoutParams(
-                0, 70, 1));
-
-        row.addView(lock, new LinearLayout.LayoutParams(
-                0, 70, 1));
+        row.addView(geser, new LinearLayout.LayoutParams(0, 70, 1));
+        row.addView(lock, new LinearLayout.LayoutParams(0, 70, 1));
 
         root.addView(row);
 
-        // TUTUP
         Button tutup = button("❌  TUTUP OVERLAY",
                 Color.rgb(220, 60, 60), white);
 
         root.addView(tutup);
 
-        // FOOTER
         TextView footer = new TextView(this);
         footer.setText("\nJADIOJOL OVERLAY • v1.0");
         footer.setTextSize(11);
@@ -162,7 +140,6 @@ buka.setOnClickListener(v -> {
         b.setTextColor(textColor);
         b.setTypeface(null, Typeface.BOLD);
         b.setAllCaps(false);
-
         b.setGravity(Gravity.CENTER);
 
         GradientDrawable bg = new GradientDrawable();
@@ -177,18 +154,15 @@ buka.setOnClickListener(v -> {
                         70);
 
         params.setMargins(0, 5, 0, 5);
-
         b.setLayoutParams(params);
 
         return b;
     }
 
     private GradientDrawable round(int color, float radius) {
-
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(color);
         bg.setCornerRadius(radius);
-
         return bg;
     }
-            }
+}
