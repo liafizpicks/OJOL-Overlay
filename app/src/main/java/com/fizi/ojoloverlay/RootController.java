@@ -9,13 +9,23 @@ public class RootController {
             int right,
             int bottom) {
 
-        if (packageName == null) {
+        if (packageName == null || packageName.length() == 0) {
             return;
         }
 
         try {
 
+            /*
+             * Cari activity utama InDrive secara otomatis,
+             * lalu jalankan dalam mode freeform.
+             */
+
             String command =
+                    "COMP=$(cmd package resolve-activity " +
+                    "--brief " +
+                    packageName +
+                    " | tail -n 1); " +
+
                     "am start " +
                     "--windowingMode 5 " +
                     "--activity-bounds " +
@@ -23,22 +33,21 @@ public class RootController {
                     top + "," +
                     right + "," +
                     bottom +
-                    " -n " +
-                    packageName;
+                    " -n $COMP";
 
             Process process =
-                    Runtime.getRuntime()
-                            .exec(
-                                    new String[]{
-                                            "su",
-                                            "-c",
-                                            command
-                                    }
-                            );
+                    Runtime.getRuntime().exec(
+                            new String[]{
+                                    "su",
+                                    "-c",
+                                    command
+                            }
+                    );
 
             process.waitFor();
 
         } catch (Exception e) {
+
             e.printStackTrace();
         }
     }
