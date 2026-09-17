@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
         logo.setGravity(Gravity.CENTER);
 
         TextView title = new TextView(this);
-        title.setText("OJOL OVERLAY");
+        title.setText("JADIOJOL OVERLAY");
         title.setTextSize(26);
         title.setTextColor(white);
         title.setTypeface(null, Typeface.BOLD);
@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
         // STATUS
         TextView status = new TextView(this);
         status.setText("●  INDRIVE READY");
-        status.setTextSize(14);
+        status.setTextSize(13);
         status.setTextColor(green);
         status.setTypeface(null, Typeface.BOLD);
         status.setGravity(Gravity.CENTER);
@@ -107,10 +107,10 @@ public class MainActivity extends Activity {
         Button lock = button("🔒  LOCK", dark, white);
 
         row.addView(geser, new LinearLayout.LayoutParams(
-                0, 58, 1));
+                0, 70, 1));
 
         row.addView(lock, new LinearLayout.LayoutParams(
-                0, 58, 1));
+                0, 70, 1));
 
         root.addView(row);
 
@@ -163,7 +163,7 @@ public class MainActivity extends Activity {
         LinearLayout.LayoutParams params =
                 new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
-                        58);
+                        70);
 
         params.setMargins(0, 5, 0, 5);
 
