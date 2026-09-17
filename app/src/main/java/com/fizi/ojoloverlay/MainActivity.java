@@ -2,6 +2,7 @@ package com.fizi.ojoloverlay;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -14,10 +15,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+import java.util.List;
 
-    private static final String INDRIVE_PACKAGE =
-            "sinet.startup.inDrver";
+public class MainActivity extends Activity {
 
     int dark = Color.rgb(18, 18, 22);
     int green = Color.rgb(0, 190, 110);
@@ -92,14 +92,7 @@ public class MainActivity extends Activity {
 
         buka.setOnClickListener(v -> {
 
-            if (inDrivePackage == null) {
-
-                toast(
-                        "InDrive tidak ditemukan"
-                );
-
-                return;
-            }
+            if (!checkInDrive()) return;
 
             startOverlayService();
 
@@ -377,7 +370,7 @@ public class MainActivity extends Activity {
 
     // =========================
     // DETEKSI INDRIVE
-    // PACKAGE DIKUNCI
+    // SCAN PACKAGE TERPASANG
     // =========================
 
     private void findInDrive() {
@@ -386,18 +379,34 @@ public class MainActivity extends Activity {
 
         try {
 
-            getPackageManager()
-                    .getApplicationInfo(
-                            INDRIVE_PACKAGE,
+            PackageManager pm =
+                    getPackageManager();
+
+            List<ApplicationInfo> apps =
+                    pm.getInstalledApplications(
                             PackageManager.GET_META_DATA
                     );
 
-            inDrivePackage =
-                    INDRIVE_PACKAGE;
+            for (ApplicationInfo app : apps) {
 
-        } catch (
-                PackageManager.NameNotFoundException e
-        ) {
+                String pkg =
+                        app.packageName;
+
+                String lower =
+                        pkg.toLowerCase();
+
+                if (
+                        lower.contains("indrive") ||
+                        lower.contains("indriver")
+                ) {
+
+                    inDrivePackage = pkg;
+
+                    break;
+                }
+            }
+
+        } catch (Exception e) {
 
             inDrivePackage = null;
         }
